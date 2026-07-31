@@ -13,9 +13,10 @@ returned at journey's end is flagged against the **passenger's** record — not 
 ## Status
 
 This is a portfolio project being built incrementally and documented at each stage —
-requirements, architecture, schema, API, then implementation. Current stage: **full design
-phase complete (SRS → architecture → schema → API → modules → roadmap) — Phase 0
-(infrastructure) is next.** See the live status page above for the up-to-date roadmap.
+requirements, architecture, schema, API, then implementation. Current stage: **design phase
+complete; Phase 0 migrations + seed scripts written — awaiting a live Supabase project to run
+them against (see `backend/PHASE0_SETUP.md`).** See the live status page above for the
+up-to-date roadmap.
 
 ## Repo structure
 
@@ -44,6 +45,12 @@ custodytrack/
   a public, token-based confirmation route since the passenger has no login)
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) — Phased build order (each phase ends with something
   demoable) and a `gh` CLI script to populate the GitHub Project board
+- [`backend/migrations/`](backend/migrations) — the real SQL: 001-006, ready to run against a
+  Supabase project
+- [`backend/seed/`](backend/seed) — synthetic reservation-chart data + a Node script for the
+  demo attendant login
+- [`backend/PHASE0_SETUP.md`](backend/PHASE0_SETUP.md) — step-by-step: create the Supabase
+  project, run migrations, seed data, verify RLS with curl
 
 ## Scope (MVP)
 
