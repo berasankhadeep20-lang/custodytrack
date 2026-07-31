@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CustodyTrack — Linen Accountability for Indian Railways</title>
+<style>
+  :root {
+    --bg: #0b0f14;
+    --panel: #121820;
+    --border: #22303c;
+    --text: #e6edf3;
+    --muted: #8b98a5;
+    --accent: #4fb3ff;
+    --accent2: #37d67a;
+    --warn: #ffb454;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+  }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 48px 24px 96px; }
+  header { margin-bottom: 40px; }
+  .tag {
+    display: inline-block;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+  }
+  h1 { font-size: 32px; margin: 0 0 8px; }
+  .sub { color: var(--muted); font-size: 16px; max-width: 60ch; }
+  section { margin-bottom: 40px; }
+  h2 { font-size: 15px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 16px; }
+  .problem {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+  }
+  .flow { display: flex; flex-direction: column; gap: 0; }
+  .step {
+    display: flex; gap: 16px; align-items: flex-start;
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+  }
+  .step:last-child { border-bottom: none; }
+  .num {
+    flex: none; width: 26px; height: 26px; border-radius: 50%;
+    background: var(--accent); color: #05131f; font-size: 13px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; margin-top: 2px;
+  }
+  .step h3 { margin: 0 0 4px; font-size: 15px; }
+  .step p { margin: 0; color: var(--muted); font-size: 14px; }
+  .roadmap { list-style: none; padding: 0; margin: 0; }
+  .roadmap li {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 0; font-size: 14px; border-bottom: 1px solid var(--border);
+  }
+  .roadmap li:last-child { border-bottom: none; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .done { background: var(--accent2); }
+  .next { background: var(--warn); }
+  .pending { background: var(--border); }
+  .status-label { color: var(--muted); font-size: 12px; margin-left: auto; }
+  footer { color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); padding-top: 24px; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="tag">In development · SRS complete</span>
+    <h1>CustodyTrack</h1>
+    <p class="sub">A PNR-linked custody record for train linen — so a passenger walking off with a blanket
+    costs the passenger, not the coach attendant's salary.</p>
+  </header>
+
+  <section>
+    <h2>The problem</h2>
+    <div class="problem">
+      <p>Indian Railways coach attendants are financially liable for missing blankets, pillows, and
+      bedsheets — the cost is deducted from their pay — even though they have no real way to stop a
+      passenger from taking linen off the train. CustodyTrack doesn't try to prevent theft directly;
+      it makes sure the accountability lands on the person who actually had custody of the item.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>How it works</h2>
+    <div class="flow">
+      <div class="step">
+        <div class="num">1</div>
+        <div><h3>Issue</h3><p>Attendant issues the full linen kit (blanket, pillow, 2 sheets, towel) per berth from the coach's passenger chart.</p></div>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <div><h3>Acknowledge</h3><p>Passenger confirms receipt via OTP or QR scan — either way, one record ties the kit to their PNR.</p></div>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <div><h3>Return</h3><p>Attendant marks items returned, item by item, any time before the passenger's stop.</p></div>
+      </div>
+      <div class="step">
+        <div class="num">4</div>
+        <div><h3>Reconcile</h3><p>Anything still unreturned at destination is flagged against the passenger's PNR — never the attendant.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Build roadmap</h2>
+    <ul class="roadmap">
+      <li><span class="dot done"></span> Software Requirements Specification <span class="status-label">Done</span></li>
+      <li><span class="dot next"></span> System architecture &amp; offline-sync design <span class="status-label">Next</span></li>
+      <li><span class="dot pending"></span> Database schema <span class="status-label">Pending</span></li>
+      <li><span class="dot pending"></span> API design <span class="status-label">Pending</span></li>
+      <li><span class="dot pending"></span> Attendant app (issue / return / OTP / QR) <span class="status-label">Pending</span></li>
+      <li><span class="dot pending"></span> Admin analytics dashboard <span class="status-label">Pending</span></li>
+      <li><span class="dot pending"></span> Testing &amp; demo dataset <span class="status-label">Pending</span></li>
+    </ul>
+  </section>
+
+  <footer>
+    Portfolio project by Ronnie (Sankhadeep Bera) ·
+    <a href="https://github.com/berasankhadeep20-lang/custodytrack">source on GitHub</a>
+  </footer>
+</div>
+</body>
+</html>
