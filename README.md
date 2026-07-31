@@ -14,8 +14,8 @@ returned at journey's end is flagged against the **passenger's** record — not 
 
 This is a portfolio project being built incrementally and documented at each stage —
 requirements, architecture, schema, API, then implementation. Current stage: **SRS,
-architecture, schema, and API design complete — module breakdown next.** See the live status
-page above for the up-to-date roadmap.
+architecture, schema, API, and module breakdown complete — implementation roadmap next.**
+See the live status page above for the up-to-date roadmap.
 
 ## Repo structure
 
@@ -39,6 +39,9 @@ custodytrack/
 - [`docs/API.md`](docs/API.md) — RPC functions for writes, PostgREST reads, and the sync
   outcome taxonomy (ok / duplicate / auth-error / validation-error / network-error) the
   offline outbox depends on
+- [`docs/MODULES.md`](docs/MODULES.md) — Frontend file structure and backend migration
+  layout, including the OTP-vs-QR auth asymmetry surfaced while breaking this down (QR needs
+  a public, token-based confirmation route since the passenger has no login)
 
 ## Scope (MVP)
 
