@@ -14,8 +14,8 @@ returned at journey's end is flagged against the **passenger's** record — not 
 
 This is a portfolio project being built incrementally and documented at each stage —
 requirements, architecture, schema, API, then implementation. Current stage: **SRS,
-architecture, and schema complete — API design next.** See the live status page above for the
-up-to-date roadmap.
+architecture, schema, and API design complete — module breakdown next.** See the live status
+page above for the up-to-date roadmap.
 
 ## Repo structure
 
@@ -36,6 +36,9 @@ custodytrack/
   with the idempotency-key strategy used to resolve OTP/QR ack conflicts
 - [`docs/SCHEMA.md`](docs/SCHEMA.md) — Postgres schema: event-sourced `custody_events` log,
   `berth_acks` (primary key enforces one ack per berth), derived-state views, and RLS policies
+- [`docs/API.md`](docs/API.md) — RPC functions for writes, PostgREST reads, and the sync
+  outcome taxonomy (ok / duplicate / auth-error / validation-error / network-error) the
+  offline outbox depends on
 
 ## Scope (MVP)
 
