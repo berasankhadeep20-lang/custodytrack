@@ -13,8 +13,9 @@ returned at journey's end is flagged against the **passenger's** record — not 
 ## Status
 
 This is a portfolio project being built incrementally and documented at each stage —
-requirements, architecture, schema, API, then implementation. Current stage: **SRS complete,
-architecture next.** See the live status page above for the up-to-date roadmap.
+requirements, architecture, schema, API, then implementation. Current stage: **SRS,
+architecture, and schema complete — API design next.** See the live status page above for the
+up-to-date roadmap.
 
 ## Repo structure
 
@@ -30,6 +31,11 @@ custodytrack/
 ## Docs
 
 - [`docs/SRS.md`](docs/SRS.md) — Software Requirements Specification (v0.2, finalized scope)
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — System architecture: offline-first attendant
+  app (React + IndexedDB outbox) syncing to Supabase (Postgres + PostgREST + Auth + Realtime),
+  with the idempotency-key strategy used to resolve OTP/QR ack conflicts
+- [`docs/SCHEMA.md`](docs/SCHEMA.md) — Postgres schema: event-sourced `custody_events` log,
+  `berth_acks` (primary key enforces one ack per berth), derived-state views, and RLS policies
 
 ## Scope (MVP)
 
