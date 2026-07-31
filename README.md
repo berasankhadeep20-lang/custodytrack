@@ -13,9 +13,9 @@ returned at journey's end is flagged against the **passenger's** record — not 
 ## Status
 
 This is a portfolio project being built incrementally and documented at each stage —
-requirements, architecture, schema, API, then implementation. Current stage: **design phase
-complete; Phase 0 migrations + seed scripts written — awaiting a live Supabase project to run
-them against (see `backend/PHASE0_SETUP.md`).** See the live status page above for the
+requirements, architecture, schema, API, then implementation. Current stage: **Phase 1 code
+written (attendant login + read-only berth chart) — run it against your own Supabase project
+per `frontend/README.md` once Phase 0 is live.** See the live status page above for the
 up-to-date roadmap.
 
 ## Repo structure
@@ -51,6 +51,8 @@ custodytrack/
   demo attendant login
 - [`backend/PHASE0_SETUP.md`](backend/PHASE0_SETUP.md) — step-by-step: create the Supabase
   project, run migrations, seed data, verify RLS with curl
+- [`frontend/`](frontend) — Phase 1 attendant app (React + Vite + Tailwind): login + read-only
+  berth chart. See [`frontend/README.md`](frontend/README.md) to run it locally.
 
 ## Scope (MVP)
 
