@@ -13,9 +13,9 @@ returned at journey's end is flagged against the **passenger's** record — not 
 ## Status
 
 This is a portfolio project being built incrementally and documented at each stage —
-requirements, architecture, schema, API, then implementation. Current stage: **SRS,
-architecture, schema, API, and module breakdown complete — implementation roadmap next.**
-See the live status page above for the up-to-date roadmap.
+requirements, architecture, schema, API, then implementation. Current stage: **full design
+phase complete (SRS → architecture → schema → API → modules → roadmap) — Phase 0
+(infrastructure) is next.** See the live status page above for the up-to-date roadmap.
 
 ## Repo structure
 
@@ -42,6 +42,8 @@ custodytrack/
 - [`docs/MODULES.md`](docs/MODULES.md) — Frontend file structure and backend migration
   layout, including the OTP-vs-QR auth asymmetry surfaced while breaking this down (QR needs
   a public, token-based confirmation route since the passenger has no login)
+- [`docs/ROADMAP.md`](docs/ROADMAP.md) — Phased build order (each phase ends with something
+  demoable) and a `gh` CLI script to populate the GitHub Project board
 
 ## Scope (MVP)
 
