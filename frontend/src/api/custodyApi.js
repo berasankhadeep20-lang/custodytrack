@@ -106,3 +106,39 @@ export async function ackBerthOtp(berthId, clientEventId, eventTime) {
     p_event_time: eventTime,
   })
 }
+
+// --- Phase 4: QR path + admin reads
+
+/**
+ * Attendant-side: mints a short-lived, single-use token for a berth. The
+ * caller displays this encoded as a QR code — see QrDisplay.jsx. Requires an
+ * authenticated attendant session (RLS on qr_tokens enforces they're assigned
+ * to this berth's coach).
+ */
+export async function generateQrToken(berthId) {
+  const { data, error } = await supabase.rpc('generate_qr_token', { p_berth_id: berthId })
+  if (error) throw error
+  return data // the token itself, a uuid
+}
+
+/**
+ * Passenger-side: consumes a token from the QR code. No login required —
+ * ack_berth_via_qr is SECURITY DEFINER specifically so this works for an
+ * anonymous session. Not routed through the outbox: this page has no local
+ * state to be optimistic about, it's a single one-shot confirmation.
+ */
+export async function ackBerthViaQr(token) {
+  return supabase.rpc('ack_berth_via_qr', { p_token: token })
+}
+
+/**
+ * Admin/TTE: reads the unresolved_items view (docs/SCHEMA.md §3). RLS on the
+ * underlying tables means an attendant calling this only ever sees their own
+ * assigned berths, never other trains' data — the view doesn't need its own
+ * separate access control, it inherits it from what it's built on.
+ */
+export async function fetchUnresolvedItems() {
+  const { data, error } = await supabase.from('unresolved_items').select('*').order('train_no')
+  if (error) throw error
+  return data
+}

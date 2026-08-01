@@ -88,3 +88,4 @@ end;
 $$;
 
 grant execute on function ack_berth_via_qr(uuid) to anon;
+grant execute on function ack_berth_via_qr(uuid) to authenticated;

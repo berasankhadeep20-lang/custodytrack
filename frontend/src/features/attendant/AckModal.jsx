@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import OtpEntry from './OtpEntry'
+import QrDisplay from './QrDisplay'
 
 export default function AckModal({ berthId, onClose, onAcked }) {
-  const [method, setMethod] = useState(null) // null | 'otp'
+  const [method, setMethod] = useState(null) // null | 'otp' | 'qr'
 
   function handleDone() {
     onAcked()
@@ -16,24 +17,21 @@ export default function AckModal({ berthId, onClose, onAcked }) {
 
         {!method && (
           <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => setMethod('otp')}
-              className="border border-accent text-accent rounded-lg py-3"
-            >
+            <button onClick={() => setMethod('otp')} className="border border-accent text-accent rounded-lg py-3">
               OTP
             </button>
-            <button
-              disabled
-              title="QR acknowledgment ships in Phase 4"
-              className="border border-border text-muted rounded-lg py-3 opacity-50 cursor-not-allowed"
-            >
-              QR (Phase 4)
+            <button onClick={() => setMethod('qr')} className="border border-accent text-accent rounded-lg py-3">
+              QR
             </button>
           </div>
         )}
 
         {method === 'otp' && (
           <OtpEntry berthId={berthId} onDone={handleDone} onCancel={() => setMethod(null)} />
+        )}
+
+        {method === 'qr' && (
+          <QrDisplay berthId={berthId} onCancel={handleDone} />
         )}
 
         {!method && (

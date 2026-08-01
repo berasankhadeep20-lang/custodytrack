@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { fetchAssignedCoach, fetchBerthChart, signOut } from '../../api/custodyApi'
 import { getCachedChart, setCachedChart } from '../../db/cacheRepo'
 import { db } from '../../db/schema'
@@ -97,8 +98,11 @@ export default function BerthList() {
         </button>
       </div>
 
-      <div className="mb-4">
+      <div className="mb-4 flex items-center justify-between">
         <ConnectivityIndicator syncState={syncState} />
+        <Link to="/admin" className="text-xs text-muted hover:text-accent">
+          Admin view →
+        </Link>
       </div>
 
       <div className="grid gap-3">
