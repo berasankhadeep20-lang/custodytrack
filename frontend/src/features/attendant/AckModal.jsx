@@ -4,8 +4,8 @@ import OtpEntry from './OtpEntry'
 export default function AckModal({ berthId, onClose, onAcked }) {
   const [method, setMethod] = useState(null) // null | 'otp'
 
-  function handleDone(result) {
-    onAcked(result)
+  function handleDone() {
+    onAcked()
     onClose()
   }
 

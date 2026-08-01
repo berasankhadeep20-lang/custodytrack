@@ -13,9 +13,9 @@ returned at journey's end is flagged against the **passenger's** record — not 
 ## Status
 
 This is a portfolio project being built incrementally and documented at each stage —
-requirements, architecture, schema, API, then implementation. Current stage: **Phase 2 code
-written (full issue/ack/return flow, OTP path) — run it against your own Supabase project per
-`frontend/README.md`.** See the live status page above for the up-to-date roadmap.
+requirements, architecture, schema, API, then implementation. Current stage: **Phase 3 code
+written (offline outbox + sync engine) — Phases 0-2 verified live, Phase 3 ready to test.**
+See the live status page above for the up-to-date roadmap.
 
 ## Repo structure
 
@@ -53,8 +53,10 @@ custodytrack/
   demo attendant login
 - [`backend/PHASE0_SETUP.md`](backend/PHASE0_SETUP.md) — step-by-step: create the Supabase
   project, run migrations, seed data, verify RLS with curl
-- [`frontend/`](frontend) — Phase 1 attendant app (React + Vite + Tailwind): login + read-only
-  berth chart. See [`frontend/README.md`](frontend/README.md) to run it locally.
+- [`frontend/`](frontend) — Attendant app (React + Vite + Tailwind): login, live berth chart,
+  issue/ack/return, and offline support (IndexedDB outbox + sync engine). See
+  [`frontend/README.md`](frontend/README.md) to run it locally and the exact offline-mode
+  test sequence.
 
 ## Scope (MVP)
 

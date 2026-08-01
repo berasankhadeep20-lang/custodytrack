@@ -22,11 +22,6 @@ export function onAuthChange(callback) {
  * Loads a coach's berth chart with joined passenger info and current item status.
  * RLS (migration 004) ensures this only returns berths the logged-in attendant
  * is actually assigned to — no client-side filtering needed or trusted.
- */
-/**
- * Loads a coach's berth chart with joined passenger info and current item status.
- * RLS (migration 004) ensures this only returns berths the logged-in attendant
- * is actually assigned to — no client-side filtering needed or trusted.
  *
  * item_current_status and berth_acks are VIEWS/tables PostgREST can't auto-embed
  * the way it does `passengers` (that one works because berths.passenger_id is a
@@ -74,42 +69,40 @@ export async function fetchAssignedCoach() {
   return data
 }
 
-// --- Phase 2: writes. All three call the RPC functions from migration 005,
-// which handle the ok/duplicate distinction server-side (see docs/API.md).
-// client_event_id is generated fresh per call — safe even on retry, since the
-// unique constraint on the server makes a retried call a harmless no-op.
+// --- Writes. All three call the RPC functions from migration 005, which handle
+// the ok/duplicate distinction server-side (see docs/API.md).
+//
+// client_event_id and event_time are passed in by the caller (the outbox — see
+// db/outboxRepo.js) rather than generated here. This matters: the idempotency
+// guarantee only works if the SAME client_event_id is reused across every retry
+// of the same logical action. Generating a fresh one per network attempt would
+// silently break the exact mechanism docs/API.md §4 depends on.
 
-export async function issueItem(berthId, itemType, itemSeq) {
-  const { data, error } = await supabase.rpc('issue_item', {
+export async function issueItem(berthId, itemType, itemSeq, clientEventId, eventTime) {
+  return supabase.rpc('issue_item', {
     p_berth_id: berthId,
     p_item_type: itemType,
     p_item_seq: itemSeq,
-    p_client_event_id: crypto.randomUUID(),
-    p_event_time: new Date().toISOString(),
+    p_client_event_id: clientEventId,
+    p_event_time: eventTime,
   })
-  if (error) throw error
-  return data
 }
 
-export async function returnItem(berthId, itemType, itemSeq) {
-  const { data, error } = await supabase.rpc('return_item', {
+export async function returnItem(berthId, itemType, itemSeq, clientEventId, eventTime) {
+  return supabase.rpc('return_item', {
     p_berth_id: berthId,
     p_item_type: itemType,
     p_item_seq: itemSeq,
-    p_client_event_id: crypto.randomUUID(),
-    p_event_time: new Date().toISOString(),
+    p_client_event_id: clientEventId,
+    p_event_time: eventTime,
   })
-  if (error) throw error
-  return data
 }
 
-export async function ackBerthOtp(berthId) {
-  const { data, error } = await supabase.rpc('ack_berth', {
+export async function ackBerthOtp(berthId, clientEventId, eventTime) {
+  return supabase.rpc('ack_berth', {
     p_berth_id: berthId,
     p_ack_method: 'otp',
-    p_client_event_id: crypto.randomUUID(),
-    p_event_time: new Date().toISOString(),
+    p_client_event_id: clientEventId,
+    p_event_time: eventTime,
   })
-  if (error) throw error
-  return data
 }

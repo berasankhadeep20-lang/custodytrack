@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { issueItem, returnItem } from '../../api/custodyApi'
+import { enqueueIssue, enqueueReturn } from '../../sync/syncEngine'
 import AckModal from './AckModal'
 
 const ITEMS = [
@@ -24,28 +24,20 @@ function StatusBadge({ status }) {
   return <span className={`text-xs px-2 py-0.5 rounded-full ${styles[status]}`}>{status}</span>
 }
 
-export default function BerthCard({ berth, onChanged }) {
+export default function BerthCard({ berth, onActionQueued }) {
   const [showAck, setShowAck] = useState(false)
-  const [busyKey, setBusyKey] = useState(null) // which item is mid-request, to disable its button only
-  const [error, setError] = useState(null)
 
+  // Enqueuing is synchronous from the UI's perspective — it writes to IndexedDB
+  // and returns almost instantly, then kicks a sync attempt in the background.
+  // No try/catch needed here the way Phase 2's direct calls needed one: writing
+  // to the local outbox essentially can't fail the way a network call can.
   async function handleToggle(item, currentStatus) {
-    const key = `${item.type}-${item.seq}`
-    setBusyKey(key)
-    setError(null)
-    try {
-      if (currentStatus === 'not issued') {
-        await issueItem(berth.berth_id, item.type, item.seq)
-      } else if (currentStatus === 'issued') {
-        await returnItem(berth.berth_id, item.type, item.seq)
-      }
-      // 'returned' is terminal for this MVP — no un-return action.
-      onChanged() // parent refetches; Phase 3 will make this optimistic instead
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setBusyKey(null)
+    if (currentStatus === 'not issued') {
+      await enqueueIssue(berth.berth_id, item.type, item.seq)
+    } else if (currentStatus === 'issued') {
+      await enqueueReturn(berth.berth_id, item.type, item.seq)
     }
+    onActionQueued()
   }
 
   return (
@@ -59,8 +51,12 @@ export default function BerthCard({ berth, onChanged }) {
       <div className="flex items-center justify-between mb-3">
         <span className="text-sm text-muted">Acknowledgment</span>
         {berth.ack ? (
-          <span className="text-xs px-2 py-0.5 rounded-full bg-accent2/20 text-accent2">
-            acked via {berth.ack.ack_method}
+          <span
+            className={`text-xs px-2 py-0.5 rounded-full ${
+              berth.ack.pending ? 'bg-warn/20 text-warn' : 'bg-accent2/20 text-accent2'
+            }`}
+          >
+            {berth.ack.pending ? 'syncing…' : `acked via ${berth.ack.ack_method}`}
           </span>
         ) : (
           <button
@@ -85,8 +81,7 @@ export default function BerthCard({ berth, onChanged }) {
                 {clickable && (
                   <button
                     onClick={() => handleToggle(item, status)}
-                    disabled={busyKey === key}
-                    className="text-xs px-2 py-0.5 rounded border border-border text-muted hover:text-white hover:border-accent disabled:opacity-40"
+                    className="text-xs px-2 py-0.5 rounded border border-border text-muted hover:text-white hover:border-accent"
                   >
                     {status === 'not issued' ? 'Issue' : 'Return'}
                   </button>
@@ -97,13 +92,11 @@ export default function BerthCard({ berth, onChanged }) {
         })}
       </div>
 
-      {error && <p className="text-sm text-red-400 mt-2">{error}</p>}
-
       {showAck && (
         <AckModal
           berthId={berth.berth_id}
           onClose={() => setShowAck(false)}
-          onAcked={onChanged}
+          onAcked={onActionQueued}
         />
       )}
     </div>

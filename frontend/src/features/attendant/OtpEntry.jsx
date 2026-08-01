@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { ackBerthOtp } from '../../api/custodyApi'
+import { enqueueAckOtp } from '../../sync/syncEngine'
 
 export default function OtpEntry({ berthId, onDone, onCancel }) {
   // No real SMS provider in this MVP (per SRS §2.1/2.4) — we generate a code here
@@ -8,25 +8,19 @@ export default function OtpEntry({ berthId, onDone, onCancel }) {
   const simulatedCode = useMemo(() => String(Math.floor(100000 + Math.random() * 900000)), [])
   const [entered, setEntered] = useState('')
   const [error, setError] = useState(null)
-  const [submitting, setSubmitting] = useState(false)
 
+  // No network call here anymore, and no loading/submitting state either — once
+  // the code matches, enqueue is a local write that returns almost instantly.
+  // The actual server confirmation happens in the background; the UI shows
+  // "syncing…" (see BerthCard's ack badge) until it's confirmed.
   async function handleSubmit(e) {
     e.preventDefault()
     if (entered !== simulatedCode) {
       setError('Code does not match. Ask the passenger to read it again.')
       return
     }
-    setSubmitting(true)
-    setError(null)
-    try {
-      const result = await ackBerthOtp(berthId)
-      // 'duplicate' happens if this berth was already acknowledged (e.g. retry,
-      // or QR beat OTP to it) — treated as success, per docs/API.md §3.
-      onDone(result)
-    } catch (err) {
-      setError(err.message)
-      setSubmitting(false)
-    }
+    await enqueueAckOtp(berthId)
+    onDone()
   }
 
   return (
@@ -47,10 +41,10 @@ export default function OtpEntry({ berthId, onDone, onCancel }) {
       <div className="flex gap-2">
         <button
           type="submit"
-          disabled={submitting || entered.length !== 6}
+          disabled={entered.length !== 6}
           className="flex-1 bg-accent text-bg font-medium rounded-lg py-2 disabled:opacity-50"
         >
-          {submitting ? 'Confirming…' : 'Confirm'}
+          Confirm
         </button>
         <button type="button" onClick={onCancel} className="px-4 text-muted hover:text-white">
           Cancel
