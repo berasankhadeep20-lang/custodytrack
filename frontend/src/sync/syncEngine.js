@@ -85,30 +85,43 @@ export async function drain() {
     const ready = await outbox.listReadyToSend()
     for (const event of ready) {
       await outbox.markSending(event.id)
-      let result, error
       try {
-        ;({ data: result, error } = await callForEvent(event))
-      } catch (thrown) {
-        error = thrown
-      }
+        let result, error
+        try {
+          ;({ data: result, error } = await callForEvent(event))
+        } catch (thrown) {
+          error = thrown
+        }
 
-      if (!error) {
-        // result.status is 'ok' or 'duplicate' — both are success from the
-        // outbox's perspective, per docs/API.md §3.
-        await outbox.removeSynced(event.id)
-        continue
-      }
+        if (!error) {
+          // result.status is 'ok' or 'duplicate' — both are success from the
+          // outbox's perspective, per docs/API.md §3.
+          await outbox.removeSynced(event.id)
+          continue
+        }
 
-      const kind = classifySyncError(error)
-      if (kind === 'auth') {
-        await outbox.markBlocked(event.id, error.message)
-        break // further items will almost certainly hit the same auth failure — stop this pass
-      } else if (kind === 'network') {
+        const kind = classifySyncError(error)
+        if (kind === 'auth') {
+          await outbox.markBlocked(event.id, error.message)
+          break // further items will almost certainly hit the same auth failure — stop this pass
+        } else if (kind === 'network') {
+          await outbox.scheduleRetry(event.id, backoffDelay(event.retry_count))
+          break // connection is likely down entirely — stop hammering it this pass
+        } else {
+          await outbox.dropWithError(event.id, error.message)
+          // validation errors are per-item, not systemic — keep processing the rest
+        }
+      } catch (unexpected) {
+        // Defensive catch: anything that throws here that ISN'T from
+        // callForEvent (a bug in classifySyncError, a Dexie write failure,
+        // etc.) would otherwise leave this item stuck at 'sending' forever,
+        // exactly like the bug this comment is here to prevent. Falling back
+        // to a scheduled retry is the safe default — worst case it retries
+        // an already-synced item, which the server-side idempotency key
+        // makes harmless.
+        console.error('Unexpected error processing outbox item', event.id, unexpected)
         await outbox.scheduleRetry(event.id, backoffDelay(event.retry_count))
-        break // connection is likely down entirely — stop hammering it this pass
-      } else {
-        await outbox.dropWithError(event.id, error.message)
-        // validation errors are per-item, not systemic — keep processing the rest
+        break
       }
     }
   } finally {
@@ -123,6 +136,8 @@ let started = false
 export function startSyncLoop() {
   if (started) return
   started = true
+
+  outbox.resetOrphanedSending() // clear anything stuck from a previous crashed/refreshed session
 
   subscribeToConnectivity((online) => {
     notify({ online })

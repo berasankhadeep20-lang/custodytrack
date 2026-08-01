@@ -28,6 +28,21 @@ export async function markSending(id) {
   await db.outbox.update(id, { status: 'sending' })
 }
 
+export async function resetOrphanedSending() {
+  // 'sending' is only ever meant to be a transient in-memory-adjacent state
+  // during a single drain() pass. If we see one at startup, the tab that set
+  // it must have refreshed, crashed, or thrown before reaching any of the
+  // resolution branches (removeSynced / scheduleRetry / markBlocked /
+  // dropWithError) — so it's orphaned, not actually in flight. Reset it to
+  // pending so it gets picked up by the next drain instead of sitting stuck
+  // forever, invisible to listReadyToSend().
+  const count = await db.outbox
+    .where('status')
+    .equals('sending')
+    .modify({ status: 'pending', next_attempt_at: new Date().toISOString() })
+  return count
+}
+
 export async function removeSynced(id) {
   await db.outbox.delete(id)
 }
