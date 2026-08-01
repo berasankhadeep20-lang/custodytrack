@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { fetchAssignedCoach, fetchBerthChart, signOut } from '../../api/custodyApi'
 import BerthCard from './BerthCard'
 
@@ -8,13 +8,17 @@ export default function BerthList() {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
 
+  const reload = useCallback(async (coachId) => {
+    const chart = await fetchBerthChart(coachId)
+    setBerths(chart)
+  }, [])
+
   useEffect(() => {
     async function load() {
       try {
         const assignedCoach = await fetchAssignedCoach()
         setCoach(assignedCoach)
-        const chart = await fetchBerthChart(assignedCoach.coach_id)
-        setBerths(chart)
+        await reload(assignedCoach.coach_id)
       } catch (err) {
         setError(err.message)
       } finally {
@@ -22,7 +26,7 @@ export default function BerthList() {
       }
     }
     load()
-  }, [])
+  }, [reload])
 
   if (loading) return <div className="p-6 text-muted">Loading berth chart…</div>
   if (error) return <div className="p-6 text-red-400">Error: {error}</div>
@@ -45,7 +49,11 @@ export default function BerthList() {
 
       <div className="grid gap-3">
         {berths.map((berth) => (
-          <BerthCard key={berth.berth_id} berth={berth} />
+          <BerthCard
+            key={berth.berth_id}
+            berth={berth}
+            onChanged={() => reload(coach.coach_id)}
+          />
         ))}
       </div>
     </div>

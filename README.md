@@ -13,10 +13,9 @@ returned at journey's end is flagged against the **passenger's** record — not 
 ## Status
 
 This is a portfolio project being built incrementally and documented at each stage —
-requirements, architecture, schema, API, then implementation. Current stage: **Phase 1 code
-written (attendant login + read-only berth chart) — run it against your own Supabase project
-per `frontend/README.md` once Phase 0 is live.** See the live status page above for the
-up-to-date roadmap.
+requirements, architecture, schema, API, then implementation. Current stage: **Phase 2 code
+written (full issue/ack/return flow, OTP path) — run it against your own Supabase project per
+`frontend/README.md`.** See the live status page above for the up-to-date roadmap.
 
 ## Repo structure
 
@@ -31,6 +30,9 @@ custodytrack/
 
 ## Docs
 
+- [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md) — **start here.** Detailed Windows
+  walkthrough: create the Supabase project, run migrations, seed data, verify with curl,
+  run the frontend, and exactly what to click to confirm each phase works.
 - [`docs/SRS.md`](docs/SRS.md) — Software Requirements Specification (v0.2, finalized scope)
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — System architecture: offline-first attendant
   app (React + IndexedDB outbox) syncing to Supabase (Postgres + PostgREST + Auth + Realtime),

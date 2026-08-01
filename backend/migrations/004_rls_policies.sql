@@ -2,8 +2,16 @@
 -- Enforced at the database, not just the app — see docs/SCHEMA.md §4.
 
 -- Helper: is the current user a TTE or admin?
+-- SECURITY DEFINER + search_path pin is required here (not just a style choice):
+-- is_assigned_to_berth() below queries the berths table, and that function is
+-- called FROM WITHIN berths' own RLS policy. Without SECURITY DEFINER, that inner
+-- query would be subject to the same RLS policy it's helping evaluate — a
+-- self-reference that resolves to "not visible" for every row, not an error,
+-- which makes it a quiet bug rather than a loud one. Running as definer bypasses
+-- RLS for this specific, narrowly-scoped lookup.
 create or replace function is_tte_or_admin() returns boolean
-language sql stable
+language sql stable security definer
+set search_path = public
 as $$
   select exists (
     select 1 from attendants where id = auth.uid() and role in ('tte', 'admin')
@@ -12,7 +20,8 @@ $$;
 
 -- Helper: is the current user assigned to the coach a given berth belongs to?
 create or replace function is_assigned_to_berth(p_berth_id uuid) returns boolean
-language sql stable
+language sql stable security definer
+set search_path = public
 as $$
   select exists (
     select 1 from journey_assignments ja
@@ -27,6 +36,12 @@ alter table coaches enable row level security;
 alter table journeys enable row level security;
 alter table custody_events enable row level security;
 alter table berth_acks enable row level security;
+alter table journey_assignments enable row level security;
+
+-- Attendants can see their own assignment row (needed for fetchAssignedCoach());
+-- TTE/admin can see all assignments.
+create policy read_own_assignments on journey_assignments for select
+  using (is_tte_or_admin() or attendant_id = auth.uid());
 
 -- Reads: TTE/admin see everything; attendants see only their assigned coaches
 create policy read_berths on berths for select
