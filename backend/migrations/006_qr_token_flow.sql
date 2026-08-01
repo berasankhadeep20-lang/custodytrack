@@ -21,6 +21,16 @@ alter table qr_tokens enable row level security;
 create policy attendant_insert_qr_tokens on qr_tokens for insert
   with check (is_assigned_to_berth(berth_id) and actor_id = auth.uid());
 
+-- Needed for a non-obvious reason: generate_qr_token() does an
+-- INSERT ... RETURNING to hand the new token back to the caller. Under RLS,
+-- Postgres checks the returned row against a SELECT policy, not just the
+-- INSERT policy's WITH CHECK — with no SELECT policy at all, that lookup is
+-- denied, and the error it raises is indistinguishable from an INSERT
+-- failure ("new row violates row-level security policy"), which made this
+-- one genuinely confusing to track down.
+create policy attendant_read_own_qr_tokens on qr_tokens for select
+  using (actor_id = auth.uid());
+
 create or replace function generate_qr_token(p_berth_id uuid) returns uuid
 language plpgsql
 security invoker

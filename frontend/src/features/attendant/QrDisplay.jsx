@@ -4,6 +4,7 @@ import { generateQrToken } from '../../api/custodyApi'
 
 export default function QrDisplay({ berthId, onCancel }) {
   const [imageUrl, setImageUrl] = useState(null)
+  const [confirmUrl, setConfirmUrl] = useState(null)
   const [error, setError] = useState(null)
   const [secondsLeft, setSecondsLeft] = useState(300) // matches the 5-minute expiry in migration 006
   const tickRef = useRef(null)
@@ -19,7 +20,10 @@ export default function QrDisplay({ berthId, onCancel }) {
         // once deployed to GitHub Pages.
         const confirmUrl = `${window.location.origin}${import.meta.env.BASE_URL}confirm/${token}`
         const dataUrl = await QRCode.toDataURL(confirmUrl, { margin: 1, width: 220 })
-        if (!cancelled) setImageUrl(dataUrl)
+        if (!cancelled) {
+          setImageUrl(dataUrl)
+          setConfirmUrl(confirmUrl)
+        }
       } catch (err) {
         if (!cancelled) setError(err.message)
       }
@@ -46,6 +50,10 @@ export default function QrDisplay({ berthId, onCancel }) {
           <p className="text-xs text-muted mt-2">
             {secondsLeft > 0 ? `Expires in ${mm}:${ss}` : 'Expired — close and try again'}
           </p>
+          <div className="mt-3 bg-bg border border-border rounded px-2 py-1.5">
+            <p className="text-[10px] text-muted mb-1">For local testing — open this in an incognito/private window:</p>
+            <p className="text-xs font-mono break-all select-all">{confirmUrl}</p>
+          </div>
         </>
       )}
       <p className="text-xs text-muted mt-3">
