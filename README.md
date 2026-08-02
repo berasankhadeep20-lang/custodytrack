@@ -13,9 +13,10 @@ returned at journey's end is flagged against the **passenger's** record — not 
 ## Status
 
 This is a portfolio project being built incrementally and documented at each stage —
-requirements, architecture, schema, API, then implementation. Current stage: **Phase 4 code
-written (QR acknowledgment + admin dashboard) — Phases 0-3 verified live.** See the live
-status page above for the up-to-date roadmap.
+requirements, architecture, schema, API, then implementation. Current stage: **MVP complete.**
+All 5 phases done and verified live — including 4 real bugs found and fixed during testing
+(see [`WRITEUP.md`](WRITEUP.md)). Expanded demo dataset and a real test suite (Vitest + pgTAP)
+are in place.
 
 ## Repo structure
 
@@ -30,6 +31,8 @@ custodytrack/
 
 ## Docs
 
+- [`WRITEUP.md`](WRITEUP.md) — portfolio summary: the problem, key engineering decisions, and
+  the real bugs found and fixed during live testing (good interview material)
 - [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md) — **start here.** Detailed Windows
   walkthrough: create the Supabase project, run migrations, seed data, verify with curl,
   run the frontend, and exactly what to click to confirm each phase works.
@@ -56,6 +59,12 @@ custodytrack/
 - [`frontend/`](frontend) — Attendant app (React + Vite + Tailwind): login, live berth chart,
   issue/ack(OTP+QR)/return, offline support, and an admin reconciliation dashboard. See
   [`frontend/README.md`](frontend/README.md) to run it and the test sequences for each phase.
+  Includes a Vitest suite (`npm test`) covering the outbox state machine and optimistic-UI
+  overlay logic.
+- [`backend/seed/seed_demo_dataset.sql`](backend/seed/seed_demo_dataset.sql) — expanded demo
+  data: 2 more trains/routes with realistic unreturned items, for a meaningful analytics chart
+- [`backend/tests/`](backend/tests) — pgTAP test proving the conflict-handling guarantee at the
+  database level (retries and OTP/QR races never produce duplicate rows)
 
 ## Scope (MVP)
 
