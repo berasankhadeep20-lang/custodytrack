@@ -33,6 +33,11 @@ custodytrack/
 
 - [`WRITEUP.md`](WRITEUP.md) — portfolio summary: the problem, key engineering decisions, and
   the real bugs found and fixed during live testing (good interview material)
+- [`docs/RAILTECH_PROPOSAL.md`](docs/RAILTECH_PROPOSAL.md) — draft proposal for Indian
+  Railways' RailTech Portal, with real RTI-sourced loss figures (₹104.51 crore, 1.27 crore
+  items, 2022-2026) and explicit differentiation from the existing Coach Mitra app
+- [`docs/RAILTECH_APPLICATION_STEPS.md`](docs/RAILTECH_APPLICATION_STEPS.md) — how to actually
+  submit it
 - [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md) — **start here.** Detailed Windows
   walkthrough: create the Supabase project, run migrations, seed data, verify with curl,
   run the frontend, and exactly what to click to confirm each phase works.
